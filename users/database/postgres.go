@@ -39,3 +39,16 @@ func GetPassword(username string) (string, error) {
 	}
 	return password, nil
 }
+
+func IsUserNameExists(username string) (bool, error) {
+	err := db.QueryRow("SELECT username FROM users WHERE username = $1 LIMIT 1", username).Scan()
+	if err == nil {
+		return true, nil
+	}
+
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+
+	return false, err
+}

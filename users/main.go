@@ -41,7 +41,16 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Check if username is already exists
+	usernameExists, err := database.IsUserNameExists(user.Username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if usernameExists {
+		http.Error(w, "Username already exists", http.StatusConflict)
+		return
+	}
 
 	hashedPassword := hashing.HashPassword(user.Password)
 
