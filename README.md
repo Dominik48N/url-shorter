@@ -32,6 +32,13 @@ Each service uses environment variables to e.g. to get the connection data of th
 * `HTTP_PORT` This is the port on which the HTTP server is running.
   * If this environment variable is not passed, port `3000` is used.
 
+### Creator
+* `POSTGRES_HOST` The hostname with port for the PostgreSQL database (e.g., `127.0.0.1:5432`)
+* `POSTGRES_USERNAME` The username for the PostgreSQL database authentication
+  * Write access is required!
+* `POSTGRES_PASSWORD` The password for the PostgreSQL database authentication
+* `POSTGRES_DATABASE` The database name where the URLs are stored.
+
 ### Users
 
 * `POSTGRES_HOST` The hostname with port for the PostgreSQL database (e.g., `127.0.0.1:5432`)
