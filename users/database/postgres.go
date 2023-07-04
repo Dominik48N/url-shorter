@@ -25,3 +25,8 @@ func ConnectToPostgres() {
 	}
 	log.Println("Connected to PostgreSQL!")
 }
+
+func InsertUser(username string, password string) error {
+	_, err := db.Exec("INSERT INTO users (username, password) VALUES ($1, $2)", username, password)
+	return err
+}
