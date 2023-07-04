@@ -8,8 +8,10 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var jwtSecret = os.Getenv("JWT_SECRET")
-var sessionTime = getSessionTime()
+var (
+	jwtSecret   = os.Getenv("JWT_SECRET")
+	sessionTime = getSessionTime()
+)
 
 func AuthUser(user User) (string, error) {
 	expirationTime := time.Now().Add(sessionTime)
