@@ -19,9 +19,10 @@ Each service uses environment variables to e.g. to get the connection data of th
 
 * `POSTGRES_HOST` The hostname with port for the PostgreSQL database (e.g., `127.0.0.1:5432`)
 * `POSTGRES_USERNAME` The username for the PostgreSQL database authentication
+  * Only a read-only user is required!
 * `POSTGRES_PASSWORD` The password for the PostgreSQL database authentication
 * `POSTGRES_DATABASE` The database name where the URLs are stored.
-* `REDIS_HOSTS` The hosts of the Redis Cluster nodes separated by commas. (e.g., `127.0.0.1:6379,127.0.0.1:6370,127.0.0.1:6371`)
+* `REDIS_HOSTS` The hosts of the Redis Cluster nodes separated by commas. (e.g., `127.0.0.1:6379,127.0.0.1:6370`)
 * `REDIS_PASSWORD` The Redis Cluster password for authentication
 * `URL_CACHING_TIME` The duration in seconds that URLs should be cached in Redis.
   * If the environment variable is not set, the time is set to 180 seconds.

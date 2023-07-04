@@ -1,96 +1,61 @@
 package main
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
-	"time"
 
-	_ "github.com/go-redis/redis"
-	"github.com/go-redis/redis/v8"
+	"github.com/Dominik48N/url-shorter/query/caching"
+	"github.com/Dominik48N/url-shorter/query/database"
 	_ "github.com/lib/pq"
 )
 
-var fallbackUrl = strings.TrimSpace(os.Getenv("FALLBACK_URL"))
+const notFound = "not_found"
+
+var fallbackURL = strings.TrimSpace(os.Getenv("FALLBACK_URL"))
 
 func main() {
+	database.ConnectToPostgres()
+	caching.ConnectToRedis()
 
-	// PostgreSQL connection
-	log.Println("Connect to postgres...")
-	connectionString := "postgresql://" + os.Getenv("POSTGRES_USERNAME") + ":" + os.Getenv("POSTGRES_PASSWORD") + "@" + os.Getenv("POSTGRES_HOST") + "/" + os.Getenv("POSTGRES_DATABASE")
-	database, err := sql.Open("postgres", connectionString)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer database.Close()
-	log.Println("Connected to postgres!")
-
-	// Redis Cluster connection
-	urlCachingDuration := getUrlCachingDuration()
-	redisCluster := redis.NewClusterClient(&redis.ClusterOptions{
-		Addrs:    getRedisNodesFromEnv(),
-		Password: os.Getenv("REDIS_PASSWORD"),
-	})
-
-	// HTTP Server
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		path := r.URL.Path
-		path = path[1:] // The first is always a "/"!
-
-		if !isValidURL(path) {
-			handleUnknownURLs(w, r)
-			return
-		}
-
-		var url string
-		ctx := context.Background()
-		cachedUrl, err := redisCluster.Get(ctx, "url:"+path).Result()
-		if err != nil {
-			err = database.QueryRow("SELECT redirect_url FROM urls WHERE link = $1", path).Scan(&url)
-			if err != nil {
-				url = "not_found"
-			}
-		} else {
-			url = cachedUrl
-		}
-
-		if url != "not_found" {
-			http.Redirect(w, r, url, http.StatusSeeOther)
-		} else {
-			handleUnknownURLs(w, r)
-		}
-
-		err = redisCluster.Set(ctx, "url:"+path, url, urlCachingDuration).Err()
-		if err != nil {
-			log.Fatalln(err)
-		}
-	})
-	http.ListenAndServe(":3000", nil)
-
+	http.HandleFunc("/", handleURLRedirect)
+	http.ListenAndServe(":3000", nil) // TODO: Make the port configurable!
 }
 
-func getUrlCachingDuration() time.Duration {
-	urlCachingDuration, err := strconv.Atoi(os.Getenv("URL_CACHING_TIME"))
-	if err != nil {
-		return 180 * time.Second
-	}
-	return time.Duration(urlCachingDuration)
-}
+func handleURLRedirect(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path[1:] // The first character is always a "/"
 
-func getRedisNodesFromEnv() []string {
-	nodes := os.Getenv("REDIS_HOSTS")
-	return strings.Split(nodes, ",")
+	if !isValidURL(path) {
+		handleUnknownURLs(w, r)
+		return
+	}
+
+	url, err := caching.GetURLFromCache(path)
+	if err != nil {
+		url, err = database.GetURLFromDatabase(path)
+		if err != nil {
+			url = notFound
+		}
+	}
+
+	if url != notFound {
+		http.Redirect(w, r, url, http.StatusSeeOther)
+	} else {
+		handleUnknownURLs(w, r)
+	}
+
+	err = caching.CacheURL(path, url)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func handleUnknownURLs(w http.ResponseWriter, r *http.Request) {
-	if len(fallbackUrl) == 0 {
-		http.Redirect(w, r, fallbackUrl, http.StatusSeeOther)
+	if fallbackURL != "" {
+		http.Redirect(w, r, fallbackURL, http.StatusSeeOther)
 		return
 	}
 
