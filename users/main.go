@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/Dominik48N/url-shorter/users/database"
+	"github.com/Dominik48N/url-shorter/users/hashing"
 	"github.com/Dominik48N/url-shorter/users/user"
 	"github.com/gorilla/mux"
 )
@@ -38,9 +39,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Hash Password
+	hashedPassword := hashing.HashPassword(user.Password)
 
-	err = database.InsertUser(user.Username, user.Password)
+	err = database.InsertUser(user.Username, hashedPassword)
 	if err != nil {
 		log.Fatalln(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
