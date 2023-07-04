@@ -6,10 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 
 	_ "github.com/lib/pq"
 )
+
+var fallbackUrl = strings.TrimSpace(os.Getenv("FALLBACK_URL"))
 
 func main() {
 
@@ -26,18 +29,19 @@ func main() {
 	// HTTP Server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
-		path = path[1:]
+		path = path[1:] // The first is always a "/"!
 
-		if strings.Contains(path, "/") || strings.Contains(path, ".") {
-			fmt.Fprintf(w, "Cannot find url!") // TODO: Maybe redirection to other website
+		if !isValidURL(path) {
+			handleUnknownURLs(w, r)
 			return
 		}
 
 		// TODO: Redis caching
+
 		var url string
 		err := database.QueryRow("SELECT redirect_url FROM urls WHERE link = $1", path).Scan(&url)
 		if err != nil {
-			fmt.Fprintf(w, "Cannot find url!") // TODO: Maybe redirection to other website
+			handleUnknownURLs(w, r)
 			return
 		}
 
@@ -45,4 +49,23 @@ func main() {
 	})
 	http.ListenAndServe(":3000", nil)
 
+}
+
+func handleUnknownURLs(w http.ResponseWriter, r *http.Request) {
+	if len(fallbackUrl) == 0 {
+		http.Redirect(w, r, fallbackUrl, http.StatusSeeOther)
+		return
+	}
+
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprint(w, "This URL was not found.")
+}
+
+func isValidURL(url string) bool {
+	if len(url) < 3 || len(url) > 12 {
+		return false
+	}
+
+	match, _ := regexp.MatchString("^[A-Za-z]+$", url)
+	return match
 }

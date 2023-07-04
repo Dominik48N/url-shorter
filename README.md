@@ -4,13 +4,12 @@ With this project, you have the possibility to shorten your URLs. In addition, t
 
 It is recommended to deploy the project in a Kubernetes cluster, corresponding manifest files can be found [here](manifests/).
 
-The URLs then look like this: `example.com/aJhIleoaUc` 
-The ID can be between 3 and 12 characters long.
+The URLs then look like this: `example.com/aJhIleoaUc` *(The ID can be between 3 and 12 characters long.)*
 
 ## Requirements
 * A [PostgreSQL](https://www.postgresql.org/) database
 * A [Redis](https://redis.io/) cluster
-* *(Optional)* a Kubernetes cluster
+* *(Optional)* A Kubernetes cluster
 
 ## Enviroment variables
 
@@ -22,3 +21,5 @@ Each service uses environment variables to e.g. to get the connection data of th
 * `POSTGRES_USERNAME` The username for the PostgreSQL database authentication
 * `POSTGRES_PASSWORD` The password for the PostgreSQL database authentication
 * `POSTGRES_DATABASE` The database name where the URLs are stored.
+* `FALLBACK_URL` If no short URL is found, the user will be redirected to the website specified here.
+  * If this environment variable is not set or is empty, you will not be redirected to a website, but only receive a message that no URL was found.
