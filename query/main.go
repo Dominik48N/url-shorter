@@ -68,8 +68,7 @@ func handleUnknownURLs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, "This URL was not found.")
+	http.Error(w, "URL not found!", http.StatusNotFound)
 }
 
 func isValidURL(url string) bool {

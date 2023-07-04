@@ -30,3 +30,12 @@ func InsertUser(username string, password string) error {
 	_, err := db.Exec("INSERT INTO users (username, password) VALUES ($1, $2)", username, password)
 	return err
 }
+
+func GetPassword(username string) (string, error) {
+	var password string
+	err := db.QueryRow("SELECT password FROM users WHERE username = $1 LIMIT 1", username).Scan(&password)
+	if err != nil {
+		return "", err
+	}
+	return password, nil
+}

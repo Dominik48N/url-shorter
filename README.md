@@ -41,6 +41,10 @@ Each service uses environment variables to e.g. to get the connection data of th
 * `POSTGRES_DATABASE` The database name where the users are stored.
 * `HTTP_PORT` This is the port on which the HTTP server is running.
   * If this environment variable is not passed, port `3000` is used.
+* `SESSION_TIME` The time in minutes how long a JWT token should be valid.
+  * By default, the time is 60 minutes.
+* `JWT_SECRET` The secret key for JWT.
+  * This should be secure and must be identical in all URL-Shorter services.
 
 ## Kubernetes
 
