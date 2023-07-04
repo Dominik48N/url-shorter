@@ -2,8 +2,6 @@
 
 With this project, you have the possibility to shorten your URLs. In addition, the project offers the possibility of statistics. Environment variables can be used to specify which statistics are to be saved.
 
-It is recommended to deploy the project in a Kubernetes cluster, corresponding manifest files can be found [here](manifests/).
-
 The URLs then look like this: `example.com/aJhIleoaUc` *(The ID can be between 3 and 12 characters long.)*
 
 ## Requirements
@@ -30,3 +28,12 @@ Each service uses environment variables to e.g. to get the connection data of th
   * If this environment variable is not set or is empty, you will not be redirected to a website, but only receive a message that no URL was found.
 * `HTTP_PORT` This is the port on which the HTTP server is running.
   * If this environment variable is not passed, port `3000` is used.
+
+## Kubernetes
+
+If you want to run URL Shorter in a Kubernetes cluster, you can use the provided [manifest files](manifests/).
+
+Depending on how many users you expect, you have to adapt the manifest files.
+* The replicas are only example values
+* You have to adjust the values ​​of the environment variables
+* An extra load balancer is used for many services. If you don't expect so many users, a load balancer for all services can make more sense.

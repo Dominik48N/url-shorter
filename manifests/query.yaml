@@ -4,6 +4,7 @@ metadata:
   name: query
   namespace: url-shorter
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: query
@@ -20,6 +21,25 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "500m"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.example.com:5432
+            - name: POSTGRES_USERNAME
+              value: urls_ro
+            - name: POSTGRES_PASSWORD
+              value: topsecret
+            - name: POSTGRES_DATABASE
+              value: urls
+            - name: REDIS_HOSTS
+              value: redis01.example.com:6379,redis02.example.com:6379,redis03.example.com:6379
+            - name: REDIS_PASSWORD
+              value: topsecret
+            - name: URL_CACHING_TIME
+              value: "180"
+            - name: FALLBACK_URL
+              value: https://example.com
+            - name: HTTP_PORT
+              value: "3000"
           ports:
             - containerPort: 3000
 ---
@@ -34,3 +54,4 @@ spec:
   ports:
     - port: 3000
       targetPort: 80
+  type: LoadBalancer
