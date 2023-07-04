@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/Dominik48N/url-shorter/query/caching"
@@ -22,7 +23,15 @@ func main() {
 	caching.ConnectToRedis()
 
 	http.HandleFunc("/", handleURLRedirect)
-	http.ListenAndServe(":3000", nil) // TODO: Make the port configurable!
+	http.ListenAndServe(fmt.Sprintf(":%d", getHttpPort()), nil)
+}
+
+func getHttpPort() int {
+	port, err := strconv.Atoi(os.Getenv("HTTP_PORT"))
+	if err != nil {
+		return 3000
+	}
+	return port
 }
 
 func handleURLRedirect(w http.ResponseWriter, r *http.Request) {

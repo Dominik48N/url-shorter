@@ -28,3 +28,5 @@ Each service uses environment variables to e.g. to get the connection data of th
   * If the environment variable is not set, the time is set to 180 seconds.
 * `FALLBACK_URL` If no short URL is found, the user will be redirected to the website specified here.
   * If this environment variable is not set or is empty, you will not be redirected to a website, but only receive a message that no URL was found.
+* `HTTP_PORT` This is the port on which the HTTP server is running.
+  * If this environment variable is not passed, port `3000` is used.
