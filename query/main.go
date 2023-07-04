@@ -1,14 +1,19 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
+	_ "github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 	_ "github.com/lib/pq"
 )
 
@@ -26,6 +31,13 @@ func main() {
 	defer database.Close()
 	log.Println("Connected to postgres!")
 
+	// Redis Cluster connection
+	urlCachingDuration := getUrlCachingDuration()
+	redisCluster := redis.NewClusterClient(&redis.ClusterOptions{
+		Addrs:    getRedisNodesFromEnv(),
+		Password: os.Getenv("REDIS_PASSWORD"),
+	})
+
 	// HTTP Server
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
@@ -36,19 +48,44 @@ func main() {
 			return
 		}
 
-		// TODO: Redis caching
-
 		var url string
-		err := database.QueryRow("SELECT redirect_url FROM urls WHERE link = $1", path).Scan(&url)
+		ctx := context.Background()
+		cachedUrl, err := redisCluster.Get(ctx, "url:"+path).Result()
 		if err != nil {
-			handleUnknownURLs(w, r)
-			return
+			err = database.QueryRow("SELECT redirect_url FROM urls WHERE link = $1", path).Scan(&url)
+			if err != nil {
+				url = "not_found"
+			}
+		} else {
+			url = cachedUrl
 		}
 
-		http.Redirect(w, r, url, http.StatusSeeOther)
+		if url != "not_found" {
+			http.Redirect(w, r, url, http.StatusSeeOther)
+		} else {
+			handleUnknownURLs(w, r)
+		}
+
+		err = redisCluster.Set(ctx, "url:"+path, url, urlCachingDuration).Err()
+		if err != nil {
+			log.Fatalln(err)
+		}
 	})
 	http.ListenAndServe(":3000", nil)
 
+}
+
+func getUrlCachingDuration() time.Duration {
+	urlCachingDuration, err := strconv.Atoi(os.Getenv("URL_CACHING_TIME"))
+	if err != nil {
+		return 180 * time.Second
+	}
+	return time.Duration(urlCachingDuration)
+}
+
+func getRedisNodesFromEnv() []string {
+	nodes := os.Getenv("REDIS_HOSTS")
+	return strings.Split(nodes, ",")
 }
 
 func handleUnknownURLs(w http.ResponseWriter, r *http.Request) {

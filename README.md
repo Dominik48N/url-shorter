@@ -21,5 +21,9 @@ Each service uses environment variables to e.g. to get the connection data of th
 * `POSTGRES_USERNAME` The username for the PostgreSQL database authentication
 * `POSTGRES_PASSWORD` The password for the PostgreSQL database authentication
 * `POSTGRES_DATABASE` The database name where the URLs are stored.
+* `REDIS_HOSTS` The hosts of the Redis Cluster nodes separated by commas. (e.g., `127.0.0.1:6379,127.0.0.1:6370,127.0.0.1:6371`)
+* `REDIS_PASSWORD` The Redis Cluster password for authentication
+* `URL_CACHING_TIME` The duration in seconds that URLs should be cached in Redis.
+  * If the environment variable is not set, the time is set to 180 seconds.
 * `FALLBACK_URL` If no short URL is found, the user will be redirected to the website specified here.
   * If this environment variable is not set or is empty, you will not be redirected to a website, but only receive a message that no URL was found.
