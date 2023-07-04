@@ -9,6 +9,9 @@ The URLs then look like this: `example.com/aJhIleoaUc` *(The ID can be between 3
 * A [Redis](https://redis.io/) cluster
 * *(Optional)* A Kubernetes cluster
 
+You need at least a PostgreSQL database, but you can also use multiple PostgreSQL databases. We have SQL files that you need to run once when setting up your database. You are free to run each file in an extra database or in one database.
+Of course, we always recommend the variant of working with several PostgreSQL databases, for reasons of security and scalability. You can find the SQL files [here](db/).
+
 ## Enviroment variables
 
 Each service uses environment variables to e.g. to get the connection data of the database. If you use the Kubernetes Manifest files, then the required environment variables with example values ​​are already available. Then you only have to change the values. However, all environment variables for the individual services are listed here again if you do not use Kubernetes or do not use the provided manifest files.
