@@ -1,4 +1,4 @@
-name: BUILD and PUSH query service
+name: BUILD and PUBLISH query service
 on:
   push:
     branches: [ master ]
