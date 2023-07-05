@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
 
+	"github.com/Dominik48N/url-shorter/url-creator/authorization"
 	"github.com/Dominik48N/url-shorter/url-creator/database"
-	"github.com/gorilla/mux"
+	"github.com/julienschmidt/httprouter"
 )
 
 const apiVersion = "v1"
@@ -16,12 +18,10 @@ const apiVersion = "v1"
 func main() {
 	database.ConnectToPostgres()
 
-	router := mux.NewRouter()
+	router := httprouter.New()
+	router.POST("/v"+apiVersion+"/create", authorization.AuthMiddleware(createHandler))
 
-	apiRouter := router.PathPrefix("/v" + apiVersion).Subrouter()
-	apiRouter.HandleFunc("/create", createHandler).Methods("POST")
-
-	http.ListenAndServe(fmt.Sprintf(":%d", getHttpPort()), router)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", getHttpPort()), router))
 }
 
 func getHttpPort() int {
@@ -32,7 +32,7 @@ func getHttpPort() int {
 	return port
 }
 
-func createHandler(w http.ResponseWriter, r *http.Request) {
+func createHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var createRequest CreateRequest
 	err := json.NewDecoder(r.Body).Decode(&createRequest)
 	if err != nil {
@@ -42,8 +42,8 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 
 	// TODO: Check valid target url (+ abuse/blacklist!)
 
-	username := "cba" // TODO: Check if user is logged in (+ username get)
-	id := "abc"       // TODO: Generate unused id
+	username := r.Context().Value("username").(string)
+	id := "abc" // TODO: Generate unused id
 
 	database.CreateURL(id, createRequest.RedirectUrl, username)
 
