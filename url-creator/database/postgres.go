@@ -25,3 +25,8 @@ func ConnectToPostgres() {
 	}
 	log.Println("Connected to PostgreSQL!")
 }
+
+func CreateURL(id, url, username string) error {
+	_, err := db.Exec("INSERT INTO urls (link, redirect_url, owner) VALUES ($1, $2, $3)", id, url, username)
+	return err
+}

@@ -15,12 +15,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const apiVersion = "v1"
+
 func main() {
 	database.ConnectToPostgres()
 
 	router := mux.NewRouter()
-	router.HandleFunc("/register", registerHandler).Methods("POST")
-	router.HandleFunc("/login", loginHandler).Methods("POST")
+
+	apiRouter := router.PathPrefix("/v" + apiVersion).Subrouter()
+	apiRouter.HandleFunc("/register", registerHandler).Methods("POST")
+	apiRouter.HandleFunc("/login", loginHandler).Methods("POST")
 
 	http.ListenAndServe(fmt.Sprintf(":%d", getHttpPort()), router)
 }

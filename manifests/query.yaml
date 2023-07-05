@@ -20,7 +20,7 @@ spec:
           resources:
             limits:
               memory: "128Mi"
-              cpu: "500m"
+              cpu: "750m"
           env:
             - name: POSTGRES_HOST
               value: postgres.example.com:5432
