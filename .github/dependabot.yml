@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directory: /query/
+    schedule:
+      interval: daily
+  - package-ecosystem: gomod
+    directory: /url-creator/
+    schedule:
+      interval: daily
+  - package-ecosystem: gomod
+    directory: /users/
+    schedule:
+      interval: daily
