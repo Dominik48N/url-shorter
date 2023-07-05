@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 var (
@@ -15,15 +15,13 @@ var (
 
 func AuthUser(user User) (string, error) {
 	expirationTime := time.Now().Add(sessionTime)
-	claims := &Claims{
-		Username: user.Username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
+	claims := jwt.MapClaims{
+		"username": user.Username,
+		"exp":      expirationTime.Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtSecret)
+	tokenString, err := token.SignedString([]byte(jwtSecret))
 	return tokenString, err
 }
 

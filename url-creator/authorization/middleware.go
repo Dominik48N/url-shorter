@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -21,8 +21,8 @@ func AuthMiddleware(next httprouter.Handle) httprouter.Handle {
 		}
 
 		tokenString := strings.Split(authHeader, "Bearer ")[1]
-		token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret, nil
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			return []byte(jwtSecret), nil
 		})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
@@ -34,13 +34,7 @@ func AuthMiddleware(next httprouter.Handle) httprouter.Handle {
 			return
 		}
 
-		claims, ok := token.Claims.(*Claims)
-		if !ok {
-			http.Error(w, "Invalid token claims", http.StatusUnauthorized)
-			return
-		}
-
-		ctx := context.WithValue(r.Context(), "username", claims.Username)
+		ctx := context.WithValue(r.Context(), "username", token.Claims.(jwt.MapClaims)["username"])
 		r = r.WithContext(ctx)
 
 		next(w, r, ps)
