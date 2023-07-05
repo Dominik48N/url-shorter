@@ -1,4 +1,4 @@
-name: BUILD and PUSH creator service
+name: BUILD and PUBLISH creator service
 on:
   push:
     branches: [ master ]
