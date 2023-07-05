@@ -14,6 +14,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const healthCheck = "health_check"
 const notFound = "not_found"
 
 var fallbackURL = strings.TrimSpace(os.Getenv("FALLBACK_URL"))
@@ -36,6 +37,11 @@ func getHttpPort() int {
 
 func handleURLRedirect(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path[1:] // The first character is always a "/"
+
+	if path == healthCheck {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	if !isValidURL(path) {
 		handleUnknownURLs(w, r)
