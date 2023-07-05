@@ -1,4 +1,4 @@
-name: BUILD and PUSH users service
+name: BUILD and PUSH query service
 on:
   push:
     branches: [ master ]
