@@ -1,5 +1,7 @@
 # URL Shorter
 
+**The project is not finished and is still being developed!**
+
 With this project, you have the possibility to shorten your URLs. In addition, the project offers the possibility of statistics. Environment variables can be used to specify which statistics are to be saved.
 
 The URLs then look like this: `example.com/aJhIleoaUc` *(The ID can be between 3 and 12 characters long.)*
