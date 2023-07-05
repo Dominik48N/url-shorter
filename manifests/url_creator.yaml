@@ -24,8 +24,11 @@ spec:
           image: ghcr.io/dominik48n/url-creator:latest
           resources:
             limits:
-              memory: "128Mi"
+              memory: "256Mi"
               cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
           env:
             - name: POSTGRES_HOST
               value: postgres.example.com:5432
