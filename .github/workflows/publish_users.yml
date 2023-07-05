@@ -8,6 +8,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: dominik48n/url-users
   TAG: latest
+  DIRECTORY: users/
 
 jobs:
   build:
@@ -27,6 +28,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: ./users/
+          context: ./${{ env.DIRECTORY }}
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
