@@ -14,8 +14,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const healthCheck = "health_check"
-const notFound = "not_found"
+const (
+	healthCheck = "health_check"
+	notFound    = "not_found"
+)
 
 var fallbackURL = strings.TrimSpace(os.Getenv("FALLBACK_URL"))
 
