@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-creator
+  namespace: url-shorter
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: url-creator
+  template:
+    metadata:
+      labels:
+        app: url-creator
+    spec:
+      containers:
+        - name: url-creator
+          imagePullPolicy: Always
+          image: ghcr.io/dominik48n/url-creator:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          env:
+            - name: POSTGRES_HOST
+              value: postgres.example.com:5432
+            - name: POSTGRES_USERNAME
+              value: urls
+            - name: POSTGRES_PASSWORD
+              value: topsecret
+            - name: POSTGRES_DATABASE
+              value: urls
+            - name: HTTP_PORT
+              value: "3000"
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: url-creator
+  namespace: url-shorter
+spec:
+  selector:
+    app: url-creator
+  ports:
+    - port: 3000
+      targetPort: 80
+  type: LoadBalancer
