@@ -13,6 +13,7 @@ import (
 const urlPrefix = "url:"
 
 var redisClusterClient *redis.ClusterClient
+var urlCachingDuration = getUrlCachingDuration()
 
 func ConnectToRedis() {
 	log.Println("Connecting to Redis...")
@@ -29,7 +30,6 @@ func ConnectToRedis() {
 }
 
 func CacheURL(path, url string) error {
-	urlCachingDuration := getUrlCachingDuration()
 	err := redisClusterClient.Set(urlPrefix+path, url, urlCachingDuration).Err()
 	return err
 }
