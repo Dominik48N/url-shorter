@@ -59,6 +59,13 @@ Each service uses environment variables to e.g. to get the connection data of th
 * `JWT_SECRET` The secret key for JWT.
   * This should be secure and must be identical in all URL-Shorter services.
 
+### Stats Saver
+* `POSTGRES_HOST` The hostname with port for the PostgreSQL database (e.g., `127.0.0.1:5432`)
+* `POSTGRES_USERNAME` The username for the PostgreSQL database authentication
+  * Write access is required!
+* `POSTGRES_PASSWORD` The password for the PostgreSQL database authentication
+* `POSTGRES_DATABASE` The database name where the URLs are stored.
+
 ## Kubernetes
 
 If you want to run URL Shorter in a Kubernetes cluster, you can use the provided [manifest files](manifests/).
