@@ -12,7 +12,7 @@ import (
 	"github.com/Dominik48N/url-shorter/users/database"
 	"github.com/Dominik48N/url-shorter/users/hashing"
 	"github.com/Dominik48N/url-shorter/users/user"
-	"github.com/gorilla/mux"
+	"github.com/julienschmidt/httprouter"
 )
 
 const apiVersion = "v1"
@@ -20,13 +20,11 @@ const apiVersion = "v1"
 func main() {
 	database.ConnectToPostgres()
 
-	router := mux.NewRouter()
+	router := httprouter.New()
+	router.POST("/v"+apiVersion+"/register", registerHandler)
+	router.POST("/v"+apiVersion+"/login", loginHandler)
 
-	apiRouter := router.PathPrefix("/v" + apiVersion).Subrouter()
-	apiRouter.HandleFunc("/register", registerHandler).Methods("POST")
-	apiRouter.HandleFunc("/login", loginHandler).Methods("POST")
-
-	http.ListenAndServe(fmt.Sprintf(":%d", getHttpPort()), router)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", getHttpPort()), router))
 }
 
 func getHttpPort() int {
@@ -37,7 +35,7 @@ func getHttpPort() int {
 	return port
 }
 
-func registerHandler(w http.ResponseWriter, r *http.Request) {
+func registerHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var user user.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -68,7 +66,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
+func loginHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var userType user.User
 	err := json.NewDecoder(r.Body).Decode(&userType)
 	if err != nil {
