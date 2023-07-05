@@ -30,3 +30,16 @@ func CreateURL(id, url, username string) error {
 	_, err := db.Exec("INSERT INTO urls (link, redirect_url, owner) VALUES ($1, $2, $3)", id, url, username)
 	return err
 }
+
+func CheckLinkExists(link string) (bool, error) {
+	err := db.QueryRow("SELECT link FROM urls WHERE link = $1 LIMIT 1", link).Scan()
+	if err == nil {
+		return true, nil
+	}
+
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+
+	return false, err
+}

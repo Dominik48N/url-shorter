@@ -10,6 +10,7 @@ import (
 
 	"github.com/Dominik48N/url-shorter/url-creator/authorization"
 	"github.com/Dominik48N/url-shorter/url-creator/database"
+	"github.com/Dominik48N/url-shorter/url-creator/generator"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -43,7 +44,11 @@ func createHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) 
 	// TODO: Check valid target url (+ abuse/blacklist!)
 
 	username := r.Context().Value("username").(string)
-	id := "abc" // TODO: Generate unused id
+	id, err := generator.GenerateRandomLink()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	database.CreateURL(id, createRequest.RedirectUrl, username)
 
