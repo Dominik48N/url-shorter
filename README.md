@@ -65,6 +65,9 @@ Each service uses environment variables to e.g. to get the connection data of th
   * Write access is required!
 * `POSTGRES_PASSWORD` The password for the PostgreSQL database authentication
 * `POSTGRES_DATABASE` The database name where the statistics are stored.
+* `HTTP_PORT` This is the port on which the HTTP server is running.
+  * If this environment variable is not passed, port `3000` is used.
+  * **This service does not have to be publicly accessible, only the Query Services need access!**
 
 ## Kubernetes
 
