@@ -64,7 +64,7 @@ Each service uses environment variables to e.g. to get the connection data of th
 * `POSTGRES_USERNAME` The username for the PostgreSQL database authentication
   * Write access is required!
 * `POSTGRES_PASSWORD` The password for the PostgreSQL database authentication
-* `POSTGRES_DATABASE` The database name where the URLs are stored.
+* `POSTGRES_DATABASE` The database name where the statistics are stored.
 
 ## Kubernetes
 
