@@ -27,19 +27,30 @@ func ConnectToPostgres() {
 }
 
 func CreateURL(id, url, username string) error {
-	_, err := db.Exec("INSERT INTO urls (link, redirect_url, owner) VALUES ($1, $2, $3)", id, url, username)
-	return err
+	stmt, err := db.Prepare("INSERT INTO urls (link, redirect_url, owner) VALUES ($1, $2, $3)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(id, url, username)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func CheckLinkExists(link string) (bool, error) {
-	err := db.QueryRow("SELECT link FROM urls WHERE link = $1 LIMIT 1", link).Scan()
-	if err == nil {
-		return true, nil
+	var l string
+	stmt, err := db.Prepare("SELECT link FROM urls WHERE link = $1 LIMIT 1")
+	if err != nil {
+		return false, err
 	}
-
+	defer stmt.Close()
+	err = stmt.QueryRow(link).Scan(&l)
 	if err == sql.ErrNoRows {
 		return false, nil
+	} else if err != nil {
+		return false, err
 	}
-
-	return false, err
+	return true, nil
 }

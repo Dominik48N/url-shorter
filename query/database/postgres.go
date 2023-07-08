@@ -28,7 +28,12 @@ func ConnectToPostgres() {
 
 func GetURLFromDatabase(path string) (string, error) {
 	var url string
-	err := db.QueryRow("SELECT redirect_url FROM urls WHERE link = $1 LIMIT 1", path).Scan(&url)
+	stmt, err := db.Prepare("SELECT redirect_url FROM urls WHERE link = $1 LIMIT 1")
+	if err != nil {
+		return "", err
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(path).Scan(&url)
 	if err != nil {
 		return "", err
 	}

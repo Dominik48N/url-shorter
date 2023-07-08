@@ -27,13 +27,26 @@ func ConnectToPostgres() {
 }
 
 func InsertUser(username string, password string) error {
-	_, err := db.Exec("INSERT INTO users (username, password) VALUES ($1, $2)", username, password)
-	return err
+	stmt, err := db.Prepare("INSERT INTO users (username, password) VALUES ($1, $2)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(username, password)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetPassword(username string) (string, error) {
 	var password string
-	err := db.QueryRow("SELECT password FROM users WHERE username = $1 LIMIT 1", username).Scan(&password)
+	stmt, err := db.Prepare("SELECT password FROM users WHERE username = $1 LIMIT 1")
+	if err != nil {
+		return "", err
+	}
+	defer stmt.Close()
+	err = stmt.QueryRow(username).Scan(&password)
 	if err != nil {
 		return "", err
 	}
@@ -41,14 +54,17 @@ func GetPassword(username string) (string, error) {
 }
 
 func IsUserNameExists(username string) (bool, error) {
-	err := db.QueryRow("SELECT username FROM users WHERE username = $1 LIMIT 1", username).Scan()
-	if err == nil {
-		return true, nil
+	var u string
+	stmt, err := db.Prepare("SELECT username FROM users WHERE username = $1 LIMIT 1")
+	if err != nil {
+		return false, err
 	}
-
+	defer stmt.Close()
+	err = stmt.QueryRow(username).Scan(&u)
 	if err == sql.ErrNoRows {
 		return false, nil
+	} else if err != nil {
+		return false, err
 	}
-
-	return false, err
+	return true, nil
 }
