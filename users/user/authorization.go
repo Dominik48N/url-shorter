@@ -10,7 +10,7 @@ import (
 
 var (
 	jwtSecret   = os.Getenv("JWT_SECRET")
-	sessionTime = getSessionTime()
+	sessionTime = GetSessionTime()
 )
 
 func AuthUser(user User) (string, error) {
@@ -25,7 +25,7 @@ func AuthUser(user User) (string, error) {
 	return tokenString, err
 }
 
-func getSessionTime() time.Duration {
+func GetSessionTime() time.Duration {
 	minutes, err := strconv.Atoi(os.Getenv("SESSION_TIME"))
 	if err != nil {
 		return 60 * time.Minute
