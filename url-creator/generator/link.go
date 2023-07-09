@@ -13,7 +13,7 @@ func GenerateRandomLink() (string, error) {
 	var err error
 
 	for linkExists {
-		link = generateRandomString(linkLengthMin, linkLengthMax)
+		link = GenerateRandomString(linkLengthMin, linkLengthMax)
 		linkExists, err = database.CheckLinkExists(link)
 		if err != nil {
 			return "", err

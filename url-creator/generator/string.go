@@ -8,7 +8,7 @@ import (
 const allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 const allowedCharsLength = len(allowedChars)
 
-func generateRandomString(minLength, maxLength int) string {
+func GenerateRandomString(minLength, maxLength int) string {
 	rand.Seed(time.Now().UnixNano())
 
 	length := rand.Intn(maxLength-minLength+1) + minLength
